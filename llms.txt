@@ -21,7 +21,7 @@ Section:Textbox({ Name, Description, Default, Placeholder, OnlyEnter, Flag, Call
 Section:Label(text, description)
 Element:Set(value), Element:Get()
 Dropdown:SetOptions(list), Keybind:IsActive()
-Window:Notify({ Title, Content, Type = "success"|"warning"|"error"|"info", Duration })
+Window:Notify({ Title, Content, Type = "success"|"warning"|"error"|"info", Duration, Progress }) -> { Update({ Title, Content, Type, Progress, Duration }), Dismiss() }
 Snowy:Notify(opts)
 Window:SaveConfig(name), Window:LoadConfig(name), Window:ListConfigs()
 Window:Toggle(state?), Window:SelectTab(tab), Window:SetToggleKey(keyCode), Window:Destroy()
@@ -29,7 +29,7 @@ Snowy.Flags[flag] holds current values. Snowy.Options[flag] holds element object
 
 ## Notes
 
-- Icons are optional Roblox asset ids. The library has no built-in icon set.
+- Icons: pass a Lucide name from Snowy.Icons (e.g. "swords", "eye", "settings") or any rbxassetid.
 - Configs need writefile, readfile, isfile (makefolder, isfolder, listfiles optional).
 - The GUI is parented to gethui(), then CoreGui, then PlayerGui, whichever works first.
 - Callbacks run in task.spawn inside pcall. Errors are printed with warn and do not break the UI.

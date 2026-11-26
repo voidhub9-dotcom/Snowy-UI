@@ -32,6 +32,23 @@ Info:Button({
     end,
 })
 
+Info:Button({
+    Name = "Test Notifications",
+    Description = "Shows every notification type, plus a progress one",
+    ButtonText = "Test",
+    Callback = function()
+        Window:Notify({ Title = "Config saved", Content = "Written to SnowyHub/default.json", Type = "success", Duration = 5 })
+        Window:Notify({ Title = "High ping", Content = "Above 250 ms for 10 seconds", Type = "warning", Duration = 6 })
+        local job = Window:Notify({ Title = "Server hop", Content = "Finding a server", Type = "info", Progress = 0 })
+        task.wait(1)
+        job:Update({ Progress = 0.35, Content = "Waiting for server" })
+        task.wait(1)
+        job:Update({ Progress = 0.7, Content = "Teleporting" })
+        task.wait(1)
+        job:Update({ Progress = 1, Content = "Done", Type = "success" })
+    end,
+})
+
 -- Combat (category with sub tabs) -------------------------------------------
 local Combat = Window:Category({ Name = "Combat", Icon = "swords", Open = true })
 

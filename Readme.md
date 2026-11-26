@@ -77,7 +77,18 @@ Section:Label(text, description)   -- returns an object with :Set(text)
 Window:Notify({ Title = "Config saved", Content = "Written to SnowyHub/default.json", Type = "success", Duration = 5 })
 ```
 
-`Type` is `"success"`, `"warning"`, `"error"` or `"info"`. Notifications slide in from the right and show a timer bar. Click the x to close one early. `Snowy:Notify(opts)` works without a window.
+`Type` is `"success"`, `"warning"`, `"error"` or `"info"`. Each one slides in from the right with an icon, the title, the step text and a bar.
+
+Without `Progress`, the bar counts down and the corner shows the seconds left. With `Progress` (0 to 1, or 0 to 100) it shows a percentage, and you update it while the work runs:
+
+```lua
+local job = Window:Notify({ Title = "Server hop", Content = "Finding a server", Type = "info", Progress = 0 })
+job:Update({ Progress = 0.6, Content = "Teleporting" })
+job:Update({ Progress = 1, Content = "Done", Type = "success" })   -- closes itself 1.5 s after 100%
+job:Dismiss()
+```
+
+`Snowy:Notify(opts)` works without a window.
 
 ## Other behaviour
 
@@ -86,3 +97,4 @@ Window:Notify({ Title = "Config saved", Content = "Written to SnowyHub/default.j
 - Drag the window by its header. On touch devices a logo button toggles the menu and can be dragged.
 - The window scales down to fit small screens.
 - Text uses Montserrat, which is built into Roblox.
+- Icons are Lucide (ISC licence), loaded from the sprite sheets published in the `@rbxts/lucide` package. Pass a name such as `Icon = "swords"`; `Snowy.Icons` lists the 36 that are included. Any `rbxassetid://` also works.

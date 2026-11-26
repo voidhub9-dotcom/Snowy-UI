@@ -2051,15 +2051,31 @@ local function GetNotifyHolder()
     return SharedNotifyHolder
 end
 
+local function TypeStyle(kind)
+    kind = string.lower(kind or "info")
+    if kind == "success" then return Theme.Success, "circle-check" end
+    if kind == "warning" or kind == "warn" then return Theme.Warning, "triangle-alert" end
+    if kind == "error" then return Theme.Error, "circle-x" end
+    return Theme.Info, "info"
+end
+
+-- Style J: title + percentage, step text, progress bar.
+-- Without Progress the bar is a countdown and the right label shows seconds left.
+-- With Progress (0-1, or 0-100) it shows a percentage; call :Update({ Progress, Content, Title, Type }).
 function Library:Notify(n, holder)
     n = n or {}
     holder = holder or GetNotifyHolder()
-    local kind = string.lower(n.Type or "info")
-    local color = Theme.Info
-    if kind == "success" then color = Theme.Success
-    elseif kind == "warning" or kind == "warn" then color = Theme.Warning
-    elseif kind == "error" then color = Theme.Error end
-    local duration = n.Duration or 5
+    local color, iconName = TypeStyle(n.Type)
+
+    local function NormProgress(v)
+        if v == nil then return nil end
+        v = tonumber(v) or 0
+        if v > 1 then v = v / 100 end
+        return Clamp(v, 0, 1)
+    end
+    local progress = NormProgress(n.Progress)
+    local duration = n.Duration
+    if duration == nil and progress == nil then duration = 5 end
 
     local slot = New("Frame", {
         BackgroundTransparency = 1,
@@ -2072,82 +2088,80 @@ function Library:Notify(n, holder)
         Position = UDim2.fromOffset(360, 0),
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
-        ClipsDescendants = true,
         Parent = slot,
-    }, { Corner(12), Stroke(Theme.Line2), Padding(12, 14, 12, 12) })
-    New("UIGradient", {
-        Color = ColorSequence.new(color:Lerp(Theme.Card, 0.78), Theme.Card),
-        Transparency = NumberSequence.new(0),
-        Offset = Vector2.new(-0.2, 0),
+    }, { Corner(12), Stroke(Theme.Line2), Padding(12, 13, 14, 14), List(Enum.FillDirection.Vertical, 0) })
+
+    local top = New("Frame", {
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 20),
+        LayoutOrder = 1,
         Parent = card,
     })
-
-    local tile = New("Frame", {
-        BackgroundColor3 = color,
-        BackgroundTransparency = 0.82,
-        Size = UDim2.fromOffset(34, 34),
-        Parent = card,
-    }, { Corner(10), Stroke(color, 1, 0.55) })
-    local iconName = "info"
-    if kind == "success" then iconName = "circle-check"
-    elseif kind == "error" then iconName = "circle-x"
-    elseif kind == "warning" or kind == "warn" then iconName = "triangle-alert" end
-    local ti = Icon(tile, iconName, 18, color)
-    ti.AnchorPoint = Vector2.new(0.5, 0.5)
-    ti.Position = UDim2.fromScale(0.5, 0.5)
-
-    local textCol = New("Frame", {
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(46, 0),
-        Size = UDim2.new(1, -70, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        Parent = card,
-    }, { List(Enum.FillDirection.Vertical, 3) })
-    Label({
+    local icon = Icon(top, iconName, 18, color)
+    icon.AnchorPoint = Vector2.new(0, 0.5)
+    icon.Position = UDim2.new(0, 0, 0.5, 0)
+    local title = Label({
         Text = n.Title or "Snowy UI",
         FontFace = F(W_BOLD),
-        TextSize = 13.5,
-        Size = UDim2.new(1, 0, 0, 18),
+        TextSize = 14,
+        Position = UDim2.fromOffset(28, 0),
+        Size = UDim2.new(1, -80, 1, 0),
         TextTruncate = Enum.TextTruncate.AtEnd,
-        LayoutOrder = 1,
-        Parent = textCol,
+        Parent = top,
     })
-    if n.Content and n.Content ~= "" then
-        Label({
-            Text = n.Content,
-            FontFace = F(W_MED),
-            TextSize = 12,
-            TextColor3 = Theme.Muted,
-            TextWrapped = true,
-            Size = UDim2.new(1, 0, 0, 0),
-            AutomaticSize = Enum.AutomaticSize.Y,
-            LayoutOrder = 2,
-            Parent = textCol,
-        })
-    end
-
-    local close = New("TextButton", {
+    local right = Label({
         Text = "",
-        BackgroundTransparency = 1,
+        FontFace = F(W_BOLD),
+        TextSize = 13.5,
+        TextColor3 = color,
+        TextXAlignment = Enum.TextXAlignment.Right,
         AnchorPoint = Vector2.new(1, 0),
         Position = UDim2.new(1, 0, 0, 0),
-        Size = UDim2.fromOffset(18, 18),
-        Parent = card,
+        Size = UDim2.new(0, 50, 1, 0),
+        Parent = top,
     })
-    local cx = Cross(close, 9, Theme.Muted)
-    cx.AnchorPoint = Vector2.new(0.5, 0.5)
-    cx.Position = UDim2.fromScale(0.5, 0.5)
 
-    local bar = New("Frame", {
+    local step = Label({
+        Text = n.Content or "",
+        FontFace = F(W_MED),
+        TextSize = 12.5,
+        TextColor3 = Theme.Muted,
+        TextWrapped = true,
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        Visible = (n.Content or "") ~= "",
+        LayoutOrder = 2,
+        Parent = card,
+    }, nil)
+    New("UIPadding", { PaddingLeft = UDim.new(0, 28), PaddingTop = UDim.new(0, 5), Parent = step })
+
+    local barWrap = New("Frame", {
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 14),
+        LayoutOrder = 3,
+        Parent = card,
+    }, { Padding(9, 0, 28, 0) })
+    local track = New("Frame", {
+        BackgroundColor3 = Theme.Track,
+        BorderSizePixel = 0,
+        ClipsDescendants = true,
+        Size = UDim2.new(1, 0, 0, 5),
+        Parent = barWrap,
+    }, { Corner(3) })
+    local fill = New("Frame", {
         BackgroundColor3 = color,
         BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0, 1),
-        Position = UDim2.new(0, -12, 1, 14),
-        Size = UDim2.new(1, 24, 0, 2),
-        Parent = card,
+        Size = UDim2.fromScale(progress or 1, 1),
+        Parent = track,
+    }, { Corner(3) })
+    local grad = New("UIGradient", {
+        Transparency = NumberSequence.new(0.4, 0),
+        Parent = fill,
     })
+    local _ = grad
 
     local closed = false
+    local token = 0
     local function Dismiss()
         if closed then return end
         closed = true
@@ -2156,13 +2170,77 @@ function Library:Notify(n, holder)
             slot:Destroy()
         end)
     end
-    close.MouseButton1Click:Connect(Dismiss)
+
+    local function StartCountdown(seconds)
+        token = token + 1
+        local my = token
+        if progress == nil then
+            fill.Size = UDim2.fromScale(1, 1)
+            Tween(fill, seconds, { Size = UDim2.fromScale(0, 1) }, Enum.EasingStyle.Linear)
+            task.spawn(function()
+                local remaining = seconds
+                while remaining > 0 and not closed and my == token do
+                    right.Text = tostring(math.ceil(remaining)) .. "s"
+                    task.wait(math.min(1, remaining))
+                    remaining = remaining - 1
+                end
+            end)
+        end
+        task.delay(seconds, function()
+            if my == token then Dismiss() end
+        end)
+    end
+
+    local function ShowProgress()
+        right.Text = tostring(math.floor(progress * 100 + 0.5)) .. "%"
+        Tween(fill, 0.35, { Size = UDim2.fromScale(progress, 1) })
+        if progress >= 1 and not duration then
+            token = token + 1
+            local my = token
+            task.delay(1.5, function()
+                if my == token then Dismiss() end
+            end)
+        end
+    end
+
+    local api = { Dismiss = Dismiss }
+    function api:Update(u)
+        if closed or type(u) ~= "table" then return end
+        if u.Title then title.Text = u.Title end
+        if u.Content then
+            step.Text = u.Content
+            step.Visible = u.Content ~= ""
+        end
+        if u.Type then
+            color, iconName = TypeStyle(u.Type)
+            local data = Icons[iconName]
+            if data then
+                icon.Image = "rbxassetid://" .. tostring(data[1])
+                icon.ImageRectOffset = Vector2.new(data[2], data[3])
+            end
+            icon.ImageColor3 = color
+            right.TextColor3 = color
+            Tween(fill, 0.25, { BackgroundColor3 = color })
+        end
+        if u.Progress ~= nil then
+            progress = NormProgress(u.Progress)
+            ShowProgress()
+        end
+        if u.Duration then
+            duration = u.Duration
+            StartCountdown(u.Duration)
+        end
+    end
 
     Tween(card, 0.45, { Position = UDim2.fromOffset(0, 0) })
-    Tween(bar, duration, { Size = UDim2.new(0, 0, 0, 2) }, Enum.EasingStyle.Linear)
-    task.delay(duration, Dismiss)
-
-    return { Dismiss = Dismiss }
+    if progress ~= nil then
+        fill.Size = UDim2.fromScale(0, 1)
+        ShowProgress()
+    end
+    if duration then
+        StartCountdown(duration)
+    end
+    return api
 end
 
 return Library
