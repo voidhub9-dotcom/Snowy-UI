@@ -1,0 +1,41 @@
+# Snowy UI
+
+> Roblox Luau UI library for executor scripts. One file, loaded with loadstring. Sidebar with tabs and folding categories, two-column collapsible sections, toggles, sliders, dropdowns, keybinds, buttons, textboxes, labels, notifications, JSON configs.
+
+Load:
+local Snowy = loadstring(game:HttpGet("https://raw.githubusercontent.com/voidhub9-dotcom/Snowy-UI/Main/Source.lua"))()
+
+## API
+
+Snowy:CreateWindow({ Title, Logo, Version, Credit, Badge, HideName, GameName, GameIcon, ToggleKey, ConfigFolder, MobileButton }) -> Window
+Window:Tab({ Name, Description, Icon }) -> Tab
+Window:Category({ Name, Icon, Open }) -> Category
+Category:Tab({ Name, Description, Icon }) -> Tab
+Tab:Section({ Name, Side = "Left"|"Right", Icon }) -> Section
+Section:Toggle({ Name, Description, Default, Flag, Callback(state) })
+Section:Slider({ Name, Description, Min, Max, Default, Increment, Suffix, Flag, Callback(value) })
+Section:Dropdown({ Name, Description, Options, Default, Multi, Icon, Color, Flag, Callback(value or list) })
+Section:Keybind({ Name, Description, Default, Mode = "Hold"|"Toggle", Flag, Callback(active), ChangedCallback(key) })
+Section:Button({ Name, Description, ButtonText, Callback() })
+Section:Textbox({ Name, Description, Default, Placeholder, OnlyEnter, Flag, Callback(text) })
+Section:Label(text, description)
+Element:Set(value), Element:Get()
+Dropdown:SetOptions(list), Keybind:IsActive()
+Window:Notify({ Title, Content, Type = "success"|"warning"|"error"|"info", Duration })
+Snowy:Notify(opts)
+Window:SaveConfig(name), Window:LoadConfig(name), Window:ListConfigs()
+Window:Toggle(state?), Window:SelectTab(tab), Window:SetToggleKey(keyCode), Window:Destroy()
+Snowy.Flags[flag] holds current values. Snowy.Options[flag] holds element objects.
+
+## Notes
+
+- Icons are optional Roblox asset ids. The library has no built-in icon set.
+- Configs need writefile, readfile, isfile (makefolder, isfolder, listfiles optional).
+- The GUI is parented to gethui(), then CoreGui, then PlayerGui, whichever works first.
+- Callbacks run in task.spawn inside pcall. Errors are printed with warn and do not break the UI.
+
+## Files
+
+- [Source.lua](Source.lua): the library
+- [Example.lua](Example.lua): full example menu
+- [Readme.md](Readme.md): documentation with examples
