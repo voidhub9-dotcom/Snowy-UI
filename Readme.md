@@ -2,8 +2,6 @@
 
 Roblox UI library by Snowy Studios. Navy and cyan, a sidebar with folding categories, two-column collapsible sections, and animations for opening the menu, switching tabs and showing notifications.
 
-![Snowy UI](previews/snowy-hub-spectrum.png)
-
 ## Load
 
 ```lua
