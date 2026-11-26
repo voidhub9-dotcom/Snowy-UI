@@ -58,6 +58,47 @@ local W_SEMI = Enum.FontWeight.SemiBold
 local W_BOLD = Enum.FontWeight.Bold
 local W_XBOLD = Enum.FontWeight.ExtraBold
 
+-- Lucide icons (ISC) from the @rbxts/lucide 0.1.3 sprite sheets, 48px set: { assetId, offsetX, offsetY }
+local Icons = {
+    ["home"] = { 16898613509, 820, 147 },
+    ["swords"] = { 16898613777, 967, 759 },
+    ["crosshair"] = { 16898613044, 453, 869 },
+    ["eye"] = { 16898613353, 771, 563 },
+    ["user"] = { 16898613869, 661, 869 },
+    ["wind"] = { 16898613869, 820, 857 },
+    ["bell"] = { 16898612819, 820, 257 },
+    ["settings"] = { 16898613777, 771, 257 },
+    ["sliders-horizontal"] = { 16898613777, 820, 355 },
+    ["zap"] = { 16898613869, 918, 906 },
+    ["target"] = { 16898613869, 514, 771 },
+    ["scan-eye"] = { 16898613699, 869, 759 },
+    ["shield"] = { 16898613777, 869, 0 },
+    ["search"] = { 16898613699, 918, 857 },
+    ["x"] = { 16898613869, 869, 906 },
+    ["minus"] = { 16898613613, 771, 196 },
+    ["chevron-down"] = { 16898612819, 196, 918 },
+    ["chevron-right"] = { 16898612819, 869, 759 },
+    ["check"] = { 16898612819, 710, 869 },
+    ["circle-check"] = { 16898612819, 869, 955 },
+    ["circle-x"] = { 16898613044, 820, 306 },
+    ["triangle-alert"] = { 16898613869, 967, 0 },
+    ["info"] = { 16898613509, 612, 869 },
+    ["keyboard"] = { 16898613509, 453, 820 },
+    ["save"] = { 16898613699, 918, 453 },
+    ["folder"] = { 16898613353, 404, 967 },
+    ["palette"] = { 16898613613, 453, 918 },
+    ["gauge"] = { 16898613353, 771, 955 },
+    ["activity"] = { 16898612629, 514, 771 },
+    ["mouse-pointer-2"] = { 16898613613, 820, 661 },
+    ["users"] = { 16898613869, 967, 98 },
+    ["crown"] = { 16898613044, 404, 918 },
+    ["gamepad-2"] = { 16898613353, 710, 967 },
+    ["copy"] = { 16898613044, 918, 612 },
+    ["log-out"] = { 16898613509, 820, 955 },
+    ["list"] = { 16898613509, 869, 808 },
+}
+Library.Icons = Icons
+
 local WINDOW_W, WINDOW_H = 916, 640
 local HEADER_H, FOOTER_H, SIDEBAR_W = 80, 36, 222
 
@@ -197,87 +238,8 @@ local function PrettyKey(key)
     return map[name] or name
 end
 
--- two-bar chevron, rotation 0 points down, -90 points right
-local function Chevron(parent, size, color)
-    local holder = New("Frame", {
-        Name = "Chevron",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromOffset(size, size),
-        Parent = parent,
-    })
-    local len = math.floor(size * 0.48 + 0.5)
-    New("Frame", {
-        BackgroundColor3 = color,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.36, 0, 0.5, 0),
-        Size = UDim2.fromOffset(len, 2),
-        Rotation = 45,
-        Parent = holder,
-    }, { Corner(1) })
-    New("Frame", {
-        BackgroundColor3 = color,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.64, 0, 0.5, 0),
-        Size = UDim2.fromOffset(len, 2),
-        Rotation = -45,
-        Parent = holder,
-    }, { Corner(1) })
-    return holder
-end
-
-local function Cross(parent, size, color, thickness)
-    local holder = New("Frame", {
-        Name = "Cross",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromOffset(size, size),
-        Parent = parent,
-    })
-    for _, rot in ipairs({ 45, -45 }) do
-        New("Frame", {
-            BackgroundColor3 = color,
-            BorderSizePixel = 0,
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.fromScale(0.5, 0.5),
-            Size = UDim2.fromOffset(math.floor(size * 1.2), thickness or 2),
-            Rotation = rot,
-            Parent = holder,
-        }, { Corner(1) })
-    end
-    return holder
-end
-
-local function Check(parent, size, color)
-    local holder = New("Frame", {
-        Name = "Check",
-        BackgroundTransparency = 1,
-        Size = UDim2.fromOffset(size, size),
-        Parent = parent,
-    })
-    New("Frame", {
-        BackgroundColor3 = color,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.33, 0, 0.62, 0),
-        Size = UDim2.fromOffset(math.floor(size * 0.45), 2),
-        Rotation = 45,
-        Parent = holder,
-    }, { Corner(1) })
-    New("Frame", {
-        BackgroundColor3 = color,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.new(0.6, 0, 0.48, 0),
-        Size = UDim2.fromOffset(math.floor(size * 0.8), 2),
-        Rotation = -50,
-        Parent = holder,
-    }, { Corner(1) })
-    return holder
-end
-
 local function Icon(parent, image, size, color)
-    return New("ImageLabel", {
+    local props = {
         Name = "Icon",
         BackgroundTransparency = 1,
         Image = image,
@@ -285,8 +247,35 @@ local function Icon(parent, image, size, color)
         Size = UDim2.fromOffset(size, size),
         ScaleType = Enum.ScaleType.Fit,
         Parent = parent,
-    })
+    }
+    local data = Icons[image]
+    if data then
+        props.Image = "rbxassetid://" .. tostring(data[1])
+        props.ImageRectOffset = Vector2.new(data[2], data[3])
+        props.ImageRectSize = Vector2.new(48, 48)
+    end
+    return New("ImageLabel", props)
 end
+
+-- chevron icon, rotation 0 points down, -90 points right
+local function Chevron(parent, size, color)
+    local c = Icon(parent, "chevron-down", size + 4, color)
+    c.Name = "Chevron"
+    return c
+end
+
+local function Cross(parent, size, color)
+    local c = Icon(parent, "x", math.floor(size * 1.6 + 0.5), color)
+    c.Name = "Cross"
+    return c
+end
+
+local function Check(parent, size, color)
+    local c = Icon(parent, "check", math.floor(size * 1.4 + 0.5), color)
+    c.Name = "Check"
+    return c
+end
+
 
 local function GuiParent()
     local ok, hui = pcall(function()
@@ -428,14 +417,22 @@ function Library:CreateWindow(opts)
 
     local brandX = 22
     if opts.Logo then
-        New("ImageLabel", {
+        -- the logo asset has wide transparent margins, so show it oversized inside a clipping frame
+        local logoClip = New("Frame", {
             Name = "Logo",
+            BackgroundTransparency = 1,
+            ClipsDescendants = true,
+            Position = UDim2.fromOffset(brandX - 2, 6),
+            Size = UDim2.fromOffset(118, 56),
+            Parent = Header,
+        })
+        New("ImageLabel", {
             BackgroundTransparency = 1,
             Image = opts.Logo,
             ScaleType = Enum.ScaleType.Fit,
-            Position = UDim2.fromOffset(brandX, 10),
-            Size = UDim2.fromOffset(92, 44),
-            Parent = Header,
+            Position = UDim2.fromOffset(-3, -29),
+            Size = UDim2.fromOffset(120, 120),
+            Parent = logoClip,
         })
     else
         Label({
@@ -453,11 +450,11 @@ function Library:CreateWindow(opts)
     end
     Label({
         Text = versionText,
-        TextSize = 10,
+        TextSize = 10.5,
         FontFace = F(W_SEMI),
         TextColor3 = Theme.Muted,
-        Position = UDim2.fromOffset(brandX + 2, 56),
-        Size = UDim2.fromOffset(180, 14),
+        Position = UDim2.fromOffset(brandX + 2, 62),
+        Size = UDim2.fromOffset(186, 14),
         Parent = Header,
     })
     New("Frame", {
@@ -517,19 +514,14 @@ function Library:CreateWindow(opts)
     end
 
     local CloseBtn = HeaderButton(-14)
-    local x = Cross(CloseBtn, 11, Theme.SubText, 2)
+    local x = Icon(CloseBtn, "x", 18, Theme.SubText)
     x.AnchorPoint = Vector2.new(0.5, 0.5)
     x.Position = UDim2.fromScale(0.5, 0.5)
 
     local MinBtn = HeaderButton(-58)
-    New("Frame", {
-        BackgroundColor3 = Theme.SubText,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromScale(0.5, 0.5),
-        Size = UDim2.fromOffset(12, 2),
-        Parent = MinBtn,
-    }, { Corner(1) })
+    local m = Icon(MinBtn, "minus", 18, Theme.SubText)
+    m.AnchorPoint = Vector2.new(0.5, 0.5)
+    m.Position = UDim2.fromScale(0.5, 0.5)
 
     local SearchBox = New("Frame", {
         Name = "Search",
@@ -539,21 +531,9 @@ function Library:CreateWindow(opts)
         BackgroundColor3 = Theme.Field,
         Parent = Header,
     }, { Corner(10), Stroke(Theme.Line2) })
-    local lens = New("Frame", {
-        BackgroundTransparency = 1,
-        Position = UDim2.fromOffset(13, 11),
-        Size = UDim2.fromOffset(11, 11),
-        Parent = SearchBox,
-    }, { Corner(6), Stroke(Theme.SubText, 2) })
-    New("Frame", {
-        BackgroundColor3 = Theme.SubText,
-        BorderSizePixel = 0,
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Position = UDim2.fromOffset(13, 13),
-        Size = UDim2.fromOffset(6, 2),
-        Rotation = 45,
-        Parent = lens,
-    }, { Corner(1) })
+    local lens = Icon(SearchBox, "search", 17, Theme.SubText)
+    lens.AnchorPoint = Vector2.new(0, 0.5)
+    lens.Position = UDim2.new(0, 12, 0.5, 0)
     local SearchInput = New("TextBox", {
         BackgroundTransparency = 1,
         ClearTextOnFocus = false,
@@ -633,9 +613,12 @@ function Library:CreateWindow(opts)
             Size = UDim2.fromOffset(0, 18),
             AutomaticSize = Enum.AutomaticSize.X,
             Parent = UserCard,
-        }, { Corner(5), Stroke(Theme.BadgeLine), Padding(0, 0, 7, 7) })
+        }, { Corner(5), Stroke(Theme.BadgeLine), Padding(0, 0, 7, 7), List(Enum.FillDirection.Horizontal, 4, nil, Enum.VerticalAlignment.Center) })
+        local crown = Icon(badge, "crown", 11, Theme.Yellow)
+        crown.LayoutOrder = 2
         Label({
             Text = opts.Badge or "Premium Users",
+            LayoutOrder = 1,
             FontFace = F(W_BOLD),
             TextSize = 10.5,
             TextColor3 = Theme.Yellow,
@@ -662,7 +645,7 @@ function Library:CreateWindow(opts)
     local PageTitle = Label({
         Text = "",
         FontFace = F(W_BOLD),
-        TextSize = 19.5,
+        TextSize = 21,
         AutomaticSize = Enum.AutomaticSize.X,
         Size = UDim2.fromOffset(0, 28),
         Parent = TitleRow,
@@ -670,7 +653,7 @@ function Library:CreateWindow(opts)
     local PageDesc = Label({
         Text = "",
         FontFace = F(W_MED),
-        TextSize = 11.5,
+        TextSize = 12.5,
         TextColor3 = Theme.Muted,
         AutomaticSize = Enum.AutomaticSize.X,
         Size = UDim2.fromOffset(0, 22),
@@ -872,12 +855,27 @@ function Library:CreateWindow(opts)
             Name = "MobileToggle",
             AutoButtonColor = false,
             BackgroundColor3 = Theme.Background,
-            Image = opts.Logo or "",
-            ScaleType = Enum.ScaleType.Fit,
-            Position = UDim2.new(0, 16, 0.5, -26),
-            Size = UDim2.fromOffset(58, 52),
+            Image = "",
+            ClipsDescendants = true,
+            Position = UDim2.new(0, 16, 0.5, -30),
+            Size = UDim2.fromOffset(68, 60),
             Parent = Gui,
-        }, { Corner(14), Stroke(Theme.Line2), Padding(6, 6, 6, 6) })
+        }, { Corner(14), Stroke(Theme.Line2) })
+        if opts.Logo then
+            New("ImageLabel", {
+                BackgroundTransparency = 1,
+                Image = opts.Logo,
+                ScaleType = Enum.ScaleType.Fit,
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                Position = UDim2.new(0.5, 0, 0.5, 2),
+                Size = UDim2.fromOffset(74, 74),
+                Parent = MobileButton,
+            })
+        else
+            local sn = Icon(MobileButton, "list", 24, Theme.Accent)
+            sn.AnchorPoint = Vector2.new(0.5, 0.5)
+            sn.Position = UDim2.fromScale(0.5, 0.5)
+        end
         local moved = false
         local conns = Draggable(MobileButton, MobileButton, function() moved = true end)
         for _, c in ipairs(conns) do
@@ -995,7 +993,7 @@ function Library:CreateWindow(opts)
         Tab.Text = Label({
             Text = Tab.Name,
             FontFace = F(W_SEMI),
-            TextSize = category and 12.5 or 14.5,
+            TextSize = category and 13.5 or 15.5,
             TextColor3 = category and Color3.fromRGB(169, 183, 197) or Theme.SubText,
             Position = UDim2.fromOffset(textX, 0),
             Size = UDim2.new(1, -textX - 8, 1, 0),
@@ -1051,6 +1049,17 @@ function Library:CreateWindow(opts)
         Tab.Left = LeftCol
         Tab.Right = RightCol
 
+        -- one column fills the page until something is added to the right side
+        local function Relayout()
+            local hasRight = false
+            for _, child in ipairs(RightCol:GetChildren()) do
+                if child:IsA("GuiObject") then hasRight = true break end
+            end
+            LeftCol.Size = hasRight and UDim2.new(0.5, -7, 0, 0) or UDim2.new(1, 0, 0, 0)
+            RightCol.Visible = hasRight
+        end
+        Relayout()
+
         local sectionCount = 0
 
         function Tab:Section(secOpts)
@@ -1061,6 +1070,7 @@ function Library:CreateWindow(opts)
                 side = (sectionCount % 2 == 1) and "Left" or "Right"
             end
             local column = (string.lower(side) == "right") and RightCol or LeftCol
+            task.defer(Relayout)
 
             local Section = { Name = secOpts.Name or "Section", Rows = {}, Open = true }
             local card = New("Frame", {
@@ -1105,7 +1115,7 @@ function Library:CreateWindow(opts)
             Label({
                 Text = Section.Name,
                 FontFace = F(W_BOLD),
-                TextSize = 15,
+                TextSize = 16,
                 Position = UDim2.fromOffset(titleX, 0),
                 Size = UDim2.new(1, -titleX - 40, 1, 0),
                 Parent = head,
@@ -1158,9 +1168,9 @@ function Library:CreateWindow(opts)
                 local title = Label({
                     Text = name,
                     FontFace = F(W_SEMI),
-                    TextSize = 14,
+                    TextSize = 15,
                     TextColor3 = Color3.fromRGB(240, 245, 250),
-                    Size = UDim2.new(1, 0, 0, 18),
+                    Size = UDim2.new(1, 0, 0, 19),
                     TextTruncate = Enum.TextTruncate.AtEnd,
                     LayoutOrder = 1,
                     Parent = textHolder,
@@ -1169,7 +1179,7 @@ function Library:CreateWindow(opts)
                     Label({
                         Text = desc,
                         FontFace = F(W_MED),
-                        TextSize = 11.5,
+                        TextSize = 12.5,
                         TextColor3 = Theme.Muted,
                         TextWrapped = true,
                         Size = UDim2.new(1, 0, 0, 0),
@@ -1275,7 +1285,7 @@ function Library:CreateWindow(opts)
                     Size = UDim2.fromOffset(0, 28),
                     AutomaticSize = Enum.AutomaticSize.X,
                     FontFace = F(W_SEMI),
-                    TextSize = 12.5,
+                    TextSize = 13.5,
                     TextColor3 = Theme.Text,
                     Text = "",
                     Parent = row,
@@ -1426,7 +1436,7 @@ function Library:CreateWindow(opts)
                 local chipText = Label({
                     Text = "",
                     FontFace = F(W_SEMI),
-                    TextSize = 12.5,
+                    TextSize = 13.5,
                     TextColor3 = valueColor,
                     Size = UDim2.fromOffset(0, 30),
                     AutomaticSize = Enum.AutomaticSize.X,
@@ -1515,7 +1525,7 @@ function Library:CreateWindow(opts)
                         local t = Label({
                             Text = tostring(opt),
                             FontFace = F(selected and W_BOLD or W_SEMI),
-                            TextSize = 12.5,
+                            TextSize = 13.5,
                             TextColor3 = selected and Theme.Accent or Theme.SubText,
                             Position = UDim2.fromOffset(10, 0),
                             Size = UDim2.new(1, -34, 1, 0),
@@ -1620,7 +1630,7 @@ function Library:CreateWindow(opts)
                 local keyText = Label({
                     Text = PrettyKey(el.Value),
                     FontFace = F(W_BOLD),
-                    TextSize = 12.5,
+                    TextSize = 13.5,
                     TextColor3 = Color3.fromRGB(207, 227, 238),
                     Size = UDim2.fromOffset(0, 30),
                     AutomaticSize = Enum.AutomaticSize.X,
@@ -1722,7 +1732,7 @@ function Library:CreateWindow(opts)
                     Size = UDim2.fromOffset(0, 30),
                     AutomaticSize = Enum.AutomaticSize.X,
                     FontFace = F(W_BOLD),
-                    TextSize = 12.5,
+                    TextSize = 13.5,
                     TextColor3 = Theme.Accent,
                     Text = o.ButtonText or "Run",
                 }, { Corner(9), Stroke(Theme.Line2), Padding(0, 0, 14, 14) })
@@ -1751,7 +1761,7 @@ function Library:CreateWindow(opts)
                     BackgroundColor3 = Theme.Field,
                     Size = UDim2.fromOffset(120, 30),
                     FontFace = F(W_SEMI),
-                    TextSize = 12.5,
+                    TextSize = 13.5,
                     TextColor3 = Theme.Text,
                     PlaceholderText = o.Placeholder or "Type...",
                     PlaceholderColor3 = Theme.Muted,
@@ -1831,7 +1841,7 @@ function Library:CreateWindow(opts)
         local text = Label({
             Text = Category.Name,
             FontFace = F(W_SEMI),
-            TextSize = 14.5,
+            TextSize = 15.5,
             TextColor3 = Theme.SubText,
             Position = UDim2.fromOffset(textX, 0),
             Size = UDim2.new(1, -textX - 34, 1, 0),
@@ -2078,25 +2088,13 @@ function Library:Notify(n, holder)
         Size = UDim2.fromOffset(34, 34),
         Parent = card,
     }, { Corner(10), Stroke(color, 1, 0.55) })
-    if kind == "success" then
-        local c = Check(tile, 14, color)
-        c.AnchorPoint = Vector2.new(0.5, 0.5)
-        c.Position = UDim2.fromScale(0.5, 0.5)
-    elseif kind == "error" then
-        local c = Cross(tile, 10, color, 2)
-        c.AnchorPoint = Vector2.new(0.5, 0.5)
-        c.Position = UDim2.fromScale(0.5, 0.5)
-    else
-        Label({
-            Text = (kind == "info") and "i" or "!",
-            FontFace = F(W_XBOLD),
-            TextSize = 16,
-            TextColor3 = color,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            Size = UDim2.fromScale(1, 1),
-            Parent = tile,
-        })
-    end
+    local iconName = "info"
+    if kind == "success" then iconName = "circle-check"
+    elseif kind == "error" then iconName = "circle-x"
+    elseif kind == "warning" or kind == "warn" then iconName = "triangle-alert" end
+    local ti = Icon(tile, iconName, 18, color)
+    ti.AnchorPoint = Vector2.new(0.5, 0.5)
+    ti.Position = UDim2.fromScale(0.5, 0.5)
 
     local textCol = New("Frame", {
         BackgroundTransparency = 1,
@@ -2136,7 +2134,7 @@ function Library:Notify(n, holder)
         Size = UDim2.fromOffset(18, 18),
         Parent = card,
     })
-    local cx = Cross(close, 8, Theme.Muted, 2)
+    local cx = Cross(close, 9, Theme.Muted)
     cx.AnchorPoint = Vector2.new(0.5, 0.5)
     cx.Position = UDim2.fromScale(0.5, 0.5)
 

@@ -15,8 +15,8 @@ local Window = Snowy:CreateWindow({
 })
 
 -- Home ---------------------------------------------------------------------
-local Home = Window:Tab({ Name = "Home", Description = "Welcome back" })
-local Info = Home:Section({ Name = "Session", Side = "Left" })
+local Home = Window:Tab({ Name = "Home", Icon = "home", Description = "Welcome back" })
+local Info = Home:Section({ Name = "Session", Side = "Left", Icon = "activity" })
 Info:Label("Snowy Hub loaded", "Press RightShift to hide or show the menu")
 Info:Button({
     Name = "Copy Job ID",
@@ -33,11 +33,11 @@ Info:Button({
 })
 
 -- Combat (category with sub tabs) -------------------------------------------
-local Combat = Window:Category({ Name = "Combat", Open = true })
+local Combat = Window:Category({ Name = "Combat", Icon = "swords", Open = true })
 
-local Aimbot = Combat:Tab({ Name = "Aimbot Settings", Description = "Lock-on, smoothing and targeting for every fight" })
+local Aimbot = Combat:Tab({ Name = "Aimbot Settings", Icon = "sliders-horizontal", Description = "Lock-on, smoothing and targeting for every fight" })
 
-local AimSec = Aimbot:Section({ Name = "Aimbot", Side = "Left" })
+local AimSec = Aimbot:Section({ Name = "Aimbot", Side = "Left", Icon = "crosshair" })
 AimSec:Keybind({
     Name = "Aim Key",
     Description = "Hold this key to lock onto a target",
@@ -52,6 +52,7 @@ AimSec:Dropdown({
     Name = "Aim Part",
     Description = "Which body part the aim snaps to",
     Options = { "Head", "UpperTorso", "HumanoidRootPart" },
+    Icon = "target",
     Default = "Head",
     Flag = "AimPart",
     Callback = function(part)
@@ -73,11 +74,12 @@ AimSec:Toggle({
     Callback = function(v) print("team check:", v) end,
 })
 
-local Smooth = Aimbot:Section({ Name = "Smoothing", Side = "Right" })
+local Smooth = Aimbot:Section({ Name = "Smoothing", Side = "Right", Icon = "zap" })
 Smooth:Dropdown({
     Name = "Response Curve",
     Description = "Snaps straight on, easier to control",
     Options = { "Instant", "Smooth", "Linear" },
+    Icon = "zap",
     Default = "Instant",
     Color = Color3.fromRGB(242, 193, 78),
     Flag = "Curve",
@@ -110,20 +112,20 @@ Smooth:Toggle({
     Callback = function(v) print("sticky:", v) end,
 })
 
-local Silent = Combat:Tab({ Name = "Silent Aim", Description = "Redirect shots without moving the camera" })
-local SilentSec = Silent:Section({ Name = "Silent Aim" })
+local Silent = Combat:Tab({ Name = "Silent Aim", Icon = "mouse-pointer-2", Description = "Redirect shots without moving the camera" })
+local SilentSec = Silent:Section({ Name = "Silent Aim", Icon = "target" })
 SilentSec:Toggle({ Name = "Enable Silent Aim", Description = "Turns silent aim on", Flag = "SilentAim" })
 SilentSec:Slider({ Name = "Hit Chance", Description = "Chance each shot is redirected", Min = 0, Max = 100, Default = 100, Suffix = "%", Flag = "HitChance" })
 
-local Trigger = Combat:Tab({ Name = "Triggerbot", Description = "Fires when your crosshair is on a target" })
-local TrigSec = Trigger:Section({ Name = "Triggerbot" })
+local Trigger = Combat:Tab({ Name = "Triggerbot", Icon = "zap", Description = "Fires when your crosshair is on a target" })
+local TrigSec = Trigger:Section({ Name = "Triggerbot", Icon = "zap" })
 TrigSec:Toggle({ Name = "Enable Triggerbot", Description = "Shoots automatically when on target", Flag = "Triggerbot" })
 TrigSec:Slider({ Name = "Delay", Description = "Wait before shooting", Min = 0, Max = 500, Default = 40, Increment = 10, Suffix = " ms", Flag = "TrigDelay" })
 
 -- Visuals ----------------------------------------------------------------------
-local Visuals = Window:Category({ Name = "Visuals" })
-local ESP = Visuals:Tab({ Name = "ESP", Description = "See players through walls" })
-local EspSec = ESP:Section({ Name = "ESP", Side = "Left" })
+local Visuals = Window:Category({ Name = "Visuals", Icon = "eye" })
+local ESP = Visuals:Tab({ Name = "ESP", Icon = "scan-eye", Description = "See players through walls" })
+local EspSec = ESP:Section({ Name = "ESP", Side = "Left", Icon = "scan-eye" })
 EspSec:Toggle({ Name = "Enable ESP", Description = "Master switch for all ESP", Flag = "ESP" })
 EspSec:Dropdown({
     Name = "Show",
@@ -134,14 +136,14 @@ EspSec:Dropdown({
     Flag = "ESPParts",
     Callback = function(list) print("esp parts:", table.concat(list, ", ")) end,
 })
-local EspFilter = ESP:Section({ Name = "Filters", Side = "Right" })
+local EspFilter = ESP:Section({ Name = "Filters", Side = "Right", Icon = "shield" })
 EspFilter:Toggle({ Name = "Exclude Friends", Description = "Hides your Roblox friends", Default = true, Flag = "ESPFriends" })
 EspFilter:Slider({ Name = "Max Distance", Description = "Players further away are hidden", Min = 50, Max = 2000, Default = 1000, Increment = 50, Suffix = " m", Flag = "ESPDist" })
 
 -- Configuration -----------------------------------------------------------
-local Settings = Window:Category({ Name = "Configuration" })
-local Cfg = Settings:Tab({ Name = "Configs", Description = "Save and load your settings" })
-local CfgSec = Cfg:Section({ Name = "Config" })
+local Settings = Window:Category({ Name = "Configuration", Icon = "settings" })
+local Cfg = Settings:Tab({ Name = "Configs", Icon = "save", Description = "Save and load your settings" })
+local CfgSec = Cfg:Section({ Name = "Config", Side = "Left", Icon = "folder" })
 local nameBox = CfgSec:Textbox({ Name = "Config Name", Description = "File name to save or load", Default = "default", Placeholder = "default" })
 CfgSec:Button({
     Name = "Save Config",
@@ -169,7 +171,7 @@ CfgSec:Button({
         })
     end,
 })
-local UiSec = Cfg:Section({ Name = "Interface", Side = "Right" })
+local UiSec = Cfg:Section({ Name = "Interface", Side = "Right", Icon = "palette" })
 UiSec:Keybind({
     Name = "Menu Key",
     Description = "Opens and closes this menu",
